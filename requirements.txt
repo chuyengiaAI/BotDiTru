@@ -1,0 +1,5 @@
+requests
+beautifulsoup4
+pandas
+google-genai
+python-telegram-bot
