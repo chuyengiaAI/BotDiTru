@@ -1,0 +1,32 @@
+name: Robot Auto Run Daily
+
+on:
+  schedule:
+    - cron: '0 0,8,16 * * *' # Chạy vào 7h sáng, 15h chiều, 23h đêm (giờ VN)
+  workflow_dispatch: # Nút để bé bấm chạy bằng tay ngay lập tức
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Cho phép robot tự ghi đè lịch sử vào file da_dang.txt
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Robot
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          TELE_TOKEN: ${{ secrets.TELE_TOKEN }}
+        run: python bot_di_tru07.py
+      - name: Save history
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add da_dang.txt
+          git commit -m "Update history from bot" || exit 0
+          git push
